@@ -33,6 +33,10 @@ migrations:
 migrate:
 	@poetry run python app/manage.py migrate
 
+.PHONY: runserver
+migrate:
+	@poetry run python app/manage.py runserver
+
 .PHONY: db-seed
 db-seed:
 	@poetry run python dev/generate_initial.data.py
