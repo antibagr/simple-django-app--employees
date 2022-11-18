@@ -17,24 +17,13 @@ lint:
 
 .PHONY: format
 format:
-	@poetry run black ./src ./tests
-	@poetry run isort ./src ./tests
+	@poetry run black ./app ./tests
+	@poetry run isort ./app ./tests
 
 .PHONY: format-check
 format-check:
-	poetry run black ./src --check
-	poetry run isort ./src --check-only
-
-.PHONY: test
-test:
-	@poetry run pytest -vv
-
-.PHONY: test-cov
-test-cov:
-	poetry run pytest \
-		--cov=app --cov=db --cov=external \
-		--cov-report=xml --cov-report=html --cov-report=term-missing:skip-covered \
-		--cov-fail-under=0.0
+	poetry run black ./app --check
+	poetry run isort ./app --check-only
 
 .PHONY: migrations
 migrations:
@@ -44,23 +33,8 @@ migrations:
 migrate:
 	@poetry run python app/manage.py migrate
 
-.PHONY: compose-up
-compose-up:
-	@docker-compose -f contrib/docker-compose.yml up -d --build
-
-.PHONY: compose-down
-compose-down:
-	-@docker-compose -f contrib/docker-compose.yml down --remove-orphans
-
-.PHONY: compose-migrations
-compose-migrations:
-	@docker-compose -f contrib/docker-compose.yml -f contrib/docker-compose.local-web-migrations.yml up -d --build
-	-@docker-compose -f contrib/docker-compose.yml -f contrib/docker-compose.local-web-migrations.yml down
-
-.PHONY: run-web
-run-web:
-	@poetry run uvicorn --factory src.asgi:get_app --host 0.0.0.0 --port 8000
-
 .PHONY: db-seed
 db-seed:
-	@docker-compose -f contrib/docker-compose.yml exec postgres psql employees -d employees -f /seed/seed.sql
+	@poetry run python dev/generate_initial.data.py
+	@poetry run python app/manage.py loaddata data.json
+	@rm -rf data.json

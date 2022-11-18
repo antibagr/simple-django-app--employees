@@ -1,0 +1,15 @@
+{% for name, department in departments.items %}
+<li>
+    {{ name }}
+    {% for employee in department.employees %}
+    <ul>
+        {{ employee }}
+    </ul>
+    {% endfor %}
+    {% if department.departments|length %}
+    <ul>
+        {% include "employees_tree_view.html" with departments=department.departments %}
+    </ul>
+    {% endif %}
+</li>
+{% endfor %}
